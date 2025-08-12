@@ -2,7 +2,28 @@ const express = require('express'); // require our express from node module
 
 const app = express(); //creating a new application of express
 
-const { adminAuth ,userAuth}= require("./middlewares/auth");
+app.get("/getuserdata",(req,res)=>{
+    try{
+    throw new error("uihkfkdnv");
+   res.send("user data sent");
+    }
+    catch(err){
+        res.status(500).send("error occurered");
+    }
+});
+
+app.use("/",(err,req,res,next)=>{
+if(err){
+    //log your errors
+    res.status(500).send("unexpected error");
+}
+});
+
+app.listen(7777,()=>{
+    console.log("server is successfully running on port 7777");
+});
+
+/*const { adminAuth ,userAuth}= require("./middlewares/auth");
 
 app.use("/admin",adminAuth);
 //app.use("/user",userAuth); // we can directly|write it inside route
@@ -19,9 +40,7 @@ app.use("/admin/deleteAlldata",(req,res)=>{
     res.send("delete data");
 });
 
-app.listen(7777,()=>{
-    console.log("server is successfully running on port 7777");
-});
+
 
 
 
