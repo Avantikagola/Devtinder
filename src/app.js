@@ -1,8 +1,44 @@
 const express = require('express'); // require our express from node module
+const connectdb=require("./config/database");
+const User=require("./models/user");
 
 const app = express(); //creating a new application of express
 
-app.get("/getuserdata",(req,res)=>{
+app.post("/signup",async(req,res)=>{
+    //creating the new instance of user model
+    const newuser=new User({
+        firstName:"Virat",
+        lastNmae:"Kohli",
+        emailId:"virat@gmail.com",
+        password:"12abjs"
+    });//creating new user with userObj data
+    try{
+        await newuser.save();
+        res.send("user added successfully");
+    }catch(err){
+        res.status(400).send("bad request"+err.message);
+    }
+});
+connectdb()
+ .then(()=>{ 
+    console.log("database connection successful");
+    app.listen(7777,()=>{
+    console.log("server is successfully running on port 7777");
+});
+}).catch((err)=>{ 
+    console.error("database cannot be connected"); 
+});
+
+
+
+
+
+
+
+
+
+
+/*app.get("/getuserdata",(req,res)=>{
     try{
     throw new error("uihkfkdnv");
    res.send("user data sent");
@@ -19,9 +55,6 @@ if(err){
 }
 });
 
-app.listen(7777,()=>{
-    console.log("server is successfully running on port 7777");
-});
 
 /*const { adminAuth ,userAuth}= require("./middlewares/auth");
 
