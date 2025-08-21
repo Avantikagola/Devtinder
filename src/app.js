@@ -1,10 +1,37 @@
 const express = require('express'); // require our express from node module
 const connectdb=require("./config/database");
 const User=require("./models/user");
+const user = require('./models/user');
 
 const app = express(); //creating a new application of express
 
 app.use(express.json());
+
+app.get("/user",async(req,res)=>{
+    const userpassword= req.body.password;
+    try{
+       const users=await User.find({password:userpassword});
+       if(users.length===0){
+             res.status(404).send("user not find");
+       }
+       else{
+        res.send(users);
+       }
+    }
+    catch(err){
+       res.status(400).send("something went wrong");
+    }
+});
+
+app.get("/feed",async(req,res)=>{
+    
+    try{
+       const users= await User.find({}); // empty filter send all the user detail
+       res.send(users);
+    }catch{
+       res.status(400).send("something went wrong");
+    }
+});
 
 app.post("/signup",async(req,res)=>{
     //console.log(req.body);
@@ -16,6 +43,11 @@ app.post("/signup",async(req,res)=>{
     }catch(err){
         res.status(400).send("bad request"+err.message);
     }
+});
+
+//FEED api -  get/feed - use to get user data on feed when you login (got all users from database)
+app.get("/feed",(req,res)=>{
+
 });
 connectdb()
  .then(()=>{ 
