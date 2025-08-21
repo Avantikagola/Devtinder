@@ -7,6 +7,18 @@ const app = express(); //creating a new application of express
 
 app.use(express.json());
 
+//delete api
+app.delete("/user",async(req,res)=>{
+    const userId=req.body.userId;
+    try{
+        const users=await User.findByIdAndDelete({_id:userId});
+        res.send("user deleted successfully");
+    }catch(err){
+        res.status(400).send("something went wrong");
+    }
+});
+
+//get one particular user data
 app.get("/user",async(req,res)=>{
     const userpassword= req.body.password;
     try{
@@ -23,16 +35,18 @@ app.get("/user",async(req,res)=>{
     }
 });
 
+//FEED api -  get/feed - use to get user data on feed when you login (got all users from database)
 app.get("/feed",async(req,res)=>{
     
     try{
        const users= await User.find({}); // empty filter send all the user detail
        res.send(users);
-    }catch{
+    }catch(err){
        res.status(400).send("something went wrong");
     }
 });
 
+//signup user api
 app.post("/signup",async(req,res)=>{
     //console.log(req.body);
     //creating the new instance of user model
@@ -45,10 +59,19 @@ app.post("/signup",async(req,res)=>{
     }
 });
 
-//FEED api -  get/feed - use to get user data on feed when you login (got all users from database)
-app.get("/feed",(req,res)=>{
-
+//update data of the user
+app.patch("/user",async(req,res)=>{
+    const userId= req.body.userId;
+   const data= req.body;
+   try{
+       const user= await User.findByIdAndUpdate({_id:userId},data,{returnDocument:"before"}); // empty filter send all the user detail
+       console.log(user);
+       res.send("user updated successfully");
+    }catch(err){
+       res.status(400).send("something went wrong");
+    }
 });
+
 connectdb()
  .then(()=>{ 
     console.log("database connection successful");
