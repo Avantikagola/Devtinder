@@ -1,4 +1,5 @@
 const mongoose= require('mongoose');
+const validator = require('validator');
 
 const userSchema= new mongoose.Schema({
     firstName:{
@@ -14,6 +15,11 @@ const userSchema= new mongoose.Schema({
         unique: true,
         lowercase:true,
         trim:true,
+        validate(value){
+            if(!validator.isEmail){
+                throw new error("emailid is not valid"+value);
+            }
+        },   
     },
     password:{
         type:String,
@@ -32,14 +38,14 @@ const userSchema= new mongoose.Schema({
         },
     },
     photUrl:{
-        type:string
+        type:String
     },
     about:{
-        type:string,
+        type:String,
         default:"This is the default about of array",
     },
     skills:{
-        type:[string],
+        type:[String],
     },
     createdAt:{
         type:Date,

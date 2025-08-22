@@ -60,11 +60,25 @@ app.post("/signup",async(req,res)=>{
 });
 
 //update data of the user
-app.patch("/user",async(req,res)=>{
-    const userId= req.body.userId;
+app.patch("/user/userId",async(req,res)=>{
+    const userId= req.params?.userId;
    const data= req.body;
    try{
-       const user= await User.findByIdAndUpdate({_id:userId},data,{returnDocument:"before"}); // empty filter send all the user detail
+const ALLOWED_UPDATES=[
+    "photoUrl",
+    "skills",
+    "about",
+    "gender",
+    "age",
+    "userId"
+];
+    const isupdateAllowed=Object.keys(data).every((k)=>
+        ALLOWED_UPDATES.includes(k)
+    );
+    if(!isupdateAllowed){
+        throw new error("update not allowed");
+    }
+    const user= await User.findByIdAndUpdate({_id:userId},data,{returnDocument:"before"}); // empty filter send all the user detail
        console.log(user);
        res.send("user updated successfully");
     }catch(err){
