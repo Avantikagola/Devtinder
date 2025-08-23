@@ -2,6 +2,8 @@ const express = require('express'); // require our express from node module
 const connectdb=require("./config/database");
 const User=require("./models/user");
 const user = require('./models/user');
+const {validatesignupdata}=require("./utils/validation");
+const bcrypt=require("bcrypt");
 
 const app = express(); //creating a new application of express
 
@@ -46,16 +48,56 @@ app.get("/feed",async(req,res)=>{
     }
 });
 
+//user login API
+app.post("/login",async(req,res)=>{
+    try{
+      // 1- validate emailid , password if they are valid
+      const{id,password}=req.body;
+
+      //2-find if user exist by validate id
+      const user= await User.findOne({id:id});
+      if(!user){
+        throw new Error("Invalid credential!");
+      }
+      const isPasswordValid= await bcrypt.compare(password,user.password);
+
+      if (isPasswordValid){
+        res.send("user login successfuly");
+      }
+      else{
+        throw new Error("Invalid credential!");
+      }
+    }
+    catch(err){
+        res.status(400).send("ERROR: " +  err.message );
+    }
+})
 //signup user api
 app.post("/signup",async(req,res)=>{
+    
+   try{ 
+    //validation of data L-09
+     validatesignupdata(req);
+
+    //encrypting the password L-09
+     const {firstName, lastName, id, password} = req.body;
+
+     const hashPassword= await bcrypt.hash(password,10);
+     console.log(hashPassword);
+ 
     //console.log(req.body);
     //creating the new instance of user model
-    const newuser=new User(req.body);//creating new user with userObj data
-    try{
+    const newuser=new User({
+        firstName,
+        lastName,
+        id,
+        password: hashPassword,
+    });//creating new user with userObj data
+    
         await newuser.save();
         res.send("user added successfully");
     }catch(err){
-        res.status(400).send("bad request"+err.message);
+        res.status(400).send("bad request"+ err.message);
     }
 });
 
