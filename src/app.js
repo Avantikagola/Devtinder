@@ -4,10 +4,14 @@ const User=require("./models/user");
 const user = require('./models/user');
 const {validatesignupdata}=require("./utils/validation");
 const bcrypt=require("bcrypt");
+const cookieparser= require('cookie-parser');
+const jwt= require('jsonwebtoken');
 
 const app = express(); //creating a new application of express
 
 app.use(express.json());
+app.use(cookieparser());
+
 
 //delete api
 app.delete("/user",async(req,res)=>{
@@ -62,6 +66,11 @@ app.post("/login",async(req,res)=>{
       const isPasswordValid= await bcrypt.compare(password,user.password);
 
       if (isPasswordValid){
+
+        const token= await jwt.sign({_id:user._id},"AVITINDER123@");
+        console.log(token);
+        //add the token to the cookie and send the response back to the user
+        res.cookie("token",token);
         res.send("user login successfuly");
       }
       else{
@@ -72,6 +81,19 @@ app.post("/login",async(req,res)=>{
         res.status(400).send("ERROR: " +  err.message );
     }
 })
+
+//get user profile
+app.get("/profile",async(req,res)=>{
+ const cookies= req.cookies;
+
+ const {token}=cookies;
+ //validate my token
+ const decodedmessage = await jwt.verify(token,"AVITINDER123@");
+ console.log(decodedmessage);
+ console.log(cookies);
+ res.send("reading cookies");
+});
+
 //signup user api
 app.post("/signup",async(req,res)=>{
     
