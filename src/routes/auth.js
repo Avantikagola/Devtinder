@@ -21,15 +21,21 @@ authRouter.post("/signup",async(req,res)=>{
  
     //console.log(req.body);
     //creating the new instance of user model
-    const newuser=new User({
+    const newuser=new User({ //change1
         firstName,
         lastName,
         id,
         password: hashPassword,
     });//creating new user with userObj data
     
-        await newuser.save();
-        res.send("user added successfully");
+     
+ const savedUser = await newuser.save();
+    const token = await savedUser.getJWT();
+    res.cookie("token", token, {
+      expires: new Date(Date.now() + 8 * 3600000),
+    });
+    res.json({ message: "User Added successfully!", data: savedUser });
+
     }catch(err){
         res.status(400).send("bad request"+ err.message);
     }
@@ -64,6 +70,5 @@ authRouter.post("/logout",async(req,res)=>{
  res.cookie("token",null,{
     expires: new Date(Date.now()),
  });
- res.send("Logout Successful!!!");
-});
+ res.send("user successfully login");});
 module.exports = authRouter;
