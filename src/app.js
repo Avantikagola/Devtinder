@@ -1,7 +1,9 @@
+require("dotenv").config();
 const express = require('express'); // require our express from node module
 const cors= require("cors"); 
 const cookieParser= require('cookie-parser');
 const connectdb=require("./config/database");
+require('dotenv').config()
 
 
 const authRouter=require("./routes/auth");
@@ -12,7 +14,7 @@ const userRouter=require("./routes/user");
 const app = express(); //creating a new application of express
 
 app.use(cors({
-    origin: "http://localhost:5173" ,
+    origin: process.env.FRONTEND_URL || "http://localhost:5173",
     credentials: true,
 }));
 app.use(express.json());
@@ -25,7 +27,7 @@ app.use("/",userRouter);
 connectdb()
  .then(()=>{ 
     console.log("database connection successful");
-    app.listen(7777,"0.0.0.0",()=>{
+    app.listen(process.env.PORT,()=>{
     console.log("server is successfully running on port 7777");
 });
 }).catch((err)=>{ 
